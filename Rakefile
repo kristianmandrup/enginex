@@ -31,9 +31,9 @@ begin
     s.files =  FileList["[A-Z]*", "lib/**/*"]
     s.bindir = "bin"
     s.executables = %w(enginex)
-    s.add_dependency("thor", "~> 0.14")
-    s.add_dependency("rails", "~> 3.0.3")
-    s.add_dependency("rake", "~> 0.8")
+    s.add_dependency("thor", "~> 0.14.6")
+    s.add_dependency("rails", "~> 3.0.5")
+    s.add_dependency("rake", "~> 0.8.7")
   end
 
   Jeweler::GemcutterTasks.new
