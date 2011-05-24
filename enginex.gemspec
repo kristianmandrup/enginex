@@ -17,9 +17,11 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
+    "Gemfile",
     "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
+    "bin/enginex",
     "lib/enginex.rb",
     "lib/templates/gitignore",
     "lib/templates/rails/application.rb",
@@ -47,15 +49,30 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<enginex>, [">= 0"])
+      s.add_runtime_dependency(%q<sqlite3>, [">= 0"])
+      s.add_runtime_dependency(%q<rspec>, [">= 2.5"])
+      s.add_runtime_dependency(%q<rspec-rails>, [">= 2.5"])
+      s.add_runtime_dependency(%q<capybara>, ["~> 0.4"])
       s.add_runtime_dependency(%q<thor>, ["~> 0.14.6"])
       s.add_runtime_dependency(%q<rails>, ["~> 3.1.0.rc1"])
       s.add_runtime_dependency(%q<rake>, ["~> 0.9"])
     else
+      s.add_dependency(%q<enginex>, [">= 0"])
+      s.add_dependency(%q<sqlite3>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 2.5"])
+      s.add_dependency(%q<rspec-rails>, [">= 2.5"])
+      s.add_dependency(%q<capybara>, ["~> 0.4"])
       s.add_dependency(%q<thor>, ["~> 0.14.6"])
       s.add_dependency(%q<rails>, ["~> 3.1.0.rc1"])
       s.add_dependency(%q<rake>, ["~> 0.9"])
     end
   else
+    s.add_dependency(%q<enginex>, [">= 0"])
+    s.add_dependency(%q<sqlite3>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 2.5"])
+    s.add_dependency(%q<rspec-rails>, [">= 2.5"])
+    s.add_dependency(%q<capybara>, ["~> 0.4"])
     s.add_dependency(%q<thor>, ["~> 0.14.6"])
     s.add_dependency(%q<rails>, ["~> 3.1.0.rc1"])
     s.add_dependency(%q<rake>, ["~> 0.9"])
