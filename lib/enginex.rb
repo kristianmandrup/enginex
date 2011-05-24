@@ -69,7 +69,7 @@ class Enginex < Thor::Group
       dummy_app_path = app_path orm
 
       say_step "Creating dummy Rails app with #{orm}"
-      invoke Rails::Generators::AppGenerator, app_args orm      
+      invoke Rails::Generators::AppGenerator, app_args(orm)      
 
       say_step "Configuring Rails app"
       change_config_files dummy_app_path
