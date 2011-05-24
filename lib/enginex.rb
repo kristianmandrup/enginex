@@ -41,6 +41,9 @@ class Enginex < Thor::Group
   class_option :js,  :type => :boolean, :default => true,
                                 :desc => "Skip javascript generation for dummy apps."
 
+  class_option :postfixes,  :type => :array, :default => [],
+                                :desc => "Special app configurations (or types) fx authlogic/devise etc"
+
   
   desc "Creates a Rails 3 engine with Rakefile, Gemfile and running tests."
 
@@ -65,32 +68,34 @@ class Enginex < Thor::Group
   say_step "Vendoring Rails applications at test/dummy-apps"
 
   def invoke_rails_app_generators
-    orms.each do |orm| 
-      dummy_app_path = app_path orm
+    postfixes.each do |postfix|
+      orms.each do |orm| 
+        dummy_app_path = app_path orm, postfix
 
-      say_step "Creating dummy Rails app with #{orm}"
-      invoke Rails::Generators::AppGenerator, app_args(orm)      
+        say_step "Creating dummy Rails app with #{orm}"
+        invoke Rails::Generators::AppGenerator, app_args(orm)      
 
-      say_step "Configuring Rails app"
-      change_config_files dummy_app_path
+        say_step "Configuring Rails app"
+        change_config_files dummy_app_path
 
-      say_step "Removing unneeded files"
-      remove_uneeded_rails_files dummy_app_path
+        say_step "Removing unneeded files"
+        remove_uneeded_rails_files dummy_app_path
             
-      if respond_to? orm_config_method(orm)
-        say_step "Configuring app for #{orm}"
-        send orm_config_method(orm), dummy_app_path
-      end
+        if respond_to? orm_config_method(orm)
+          say_step "Configuring app for #{orm}"
+          send orm_config_method(orm), dummy_app_path
+        end
 
-      say_step "Configuring testing framework for #{orm}"      
-      set_orm_helpers orm
+        say_step "Configuring testing framework for #{orm}"      
+        set_orm_helpers orm
+      end
     end
   end
 
   protected
 
-    def set_orm_helpers orm
-      dummy_app_path = app_path orm
+    def set_orm_helpers orm, postfix
+      dummy_app_path = app_path orm, postfix
       inside dummy_app_path do
         inside test_path do
           if rspec?
@@ -157,7 +162,11 @@ gem "bson_ext"
     end
 
     def active_record? orm
-      !orm || ['active_record', 'ar'].include? orm
+      !orm || is_ar?(orm)
+    end
+
+    def is_ar? orm
+      ['active_record', 'ar'].include?(orm)
     end
 
     def skip_testunit?
