@@ -22,18 +22,18 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name = "enginex"
-    s.version = "0.8.1"
+    s.version = "0.8.2"
     s.summary = "Creates a Rails 3 engine with Rakefile, Gemfile and running tests"
     s.email = "jose.valim@plataformatec.com.br"
     s.homepage = "http://github.com/josevalim/enginex"
     s.description = "Creates a Rails 3 engine with Rakefile, Gemfile and running tests"
     s.authors = ['José Valim']
-    s.files =  FileList["[A-Z]*", "lib/**/*"]
+    s.files =  FileList["[A-Z]*", "lib/**/*", "bin/*"]
     s.bindir = "bin"
     s.executables = %w(enginex)
-    s.add_dependency("thor", "~> 0.14.6")
-    s.add_dependency("rails", "~> 3.0.5")
-    s.add_dependency("rake", "~> 0.8.7")
+    s.add_dependency("thor",  "~> 0.14.6")
+    s.add_dependency("rails", "~> 3.1.0.rc1")
+    s.add_dependency("rake",  "~> 0.9")
   end
 
   Jeweler::GemcutterTasks.new

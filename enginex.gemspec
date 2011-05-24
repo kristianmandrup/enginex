@@ -5,21 +5,18 @@
 
 Gem::Specification.new do |s|
   s.name = %q{enginex}
-  s.version = "0.8.1"
+  s.version = "0.8.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Jos\303\251 Valim"]
-  s.date = %q{2011-03-01}
-  s.default_executable = %q{enginex}
+  s.authors = [%q{José Valim}]
+  s.date = %q{2011-05-24}
   s.description = %q{Creates a Rails 3 engine with Rakefile, Gemfile and running tests}
   s.email = %q{jose.valim@plataformatec.com.br}
-  s.executables = ["enginex"]
+  s.executables = [%q{enginex}]
   s.extra_rdoc_files = [
     "README.rdoc"
   ]
   s.files = [
-    "Gemfile",
-    "Gemfile.lock",
     "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
@@ -42,30 +39,26 @@ Gem::Specification.new do |s|
     "lib/templates/test/test_helper.rb"
   ]
   s.homepage = %q{http://github.com/josevalim/enginex}
-  s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
+  s.require_paths = [%q{lib}]
+  s.rubygems_version = %q{1.8.3}
   s.summary = %q{Creates a Rails 3 engine with Rakefile, Gemfile and running tests}
-  s.test_files = [
-    "test/enginex_test.rb",
-    "test/test_helper.rb"
-  ]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<thor>, ["~> 0.14.6"])
-      s.add_runtime_dependency(%q<rails>, ["~> 3.0.5"])
-      s.add_runtime_dependency(%q<rake>, ["~> 0.8.7"])
+      s.add_runtime_dependency(%q<rails>, ["~> 3.1.0.rc1"])
+      s.add_runtime_dependency(%q<rake>, ["~> 0.9"])
     else
       s.add_dependency(%q<thor>, ["~> 0.14.6"])
-      s.add_dependency(%q<rails>, ["~> 3.0.5"])
-      s.add_dependency(%q<rake>, ["~> 0.8.7"])
+      s.add_dependency(%q<rails>, ["~> 3.1.0.rc1"])
+      s.add_dependency(%q<rake>, ["~> 0.9"])
     end
   else
     s.add_dependency(%q<thor>, ["~> 0.14.6"])
-    s.add_dependency(%q<rails>, ["~> 3.0.5"])
-    s.add_dependency(%q<rake>, ["~> 0.8.7"])
+    s.add_dependency(%q<rails>, ["~> 3.1.0.rc1"])
+    s.add_dependency(%q<rake>, ["~> 0.9"])
   end
 end
 
