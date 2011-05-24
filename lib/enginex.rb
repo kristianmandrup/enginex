@@ -6,6 +6,8 @@ require "active_support/core_ext/string"
 require "rails/generators"
 require "rails/generators/rails/app/app_generator"
 
+require "sugar-high/file"
+
 class Enginex < Thor::Group
   include Thor::Actions
   check_unknown_options!
@@ -29,6 +31,16 @@ class Enginex < Thor::Group
 
   class_option :test_framework, :default => "test_unit", :aliases => "-t",
                                 :desc => "Test framework to use. test_unit or rspec."
+
+  class_option :orms, :type => :array, :default => ['active_record'], :aliases => "-o",
+                                :desc => "Datastore frameworks to use. mongoid or active_record."
+
+  class_option :tu,  :type => :boolean, :default => true,
+                                :desc => "Skip testunit generation for dummy apps."
+
+  class_option :js,  :type => :boolean, :default => true,
+                                :desc => "Skip javascript generation for dummy apps."
+
   
   desc "Creates a Rails 3 engine with Rakefile, Gemfile and running tests."
 
@@ -50,40 +62,111 @@ class Enginex < Thor::Group
     template "gitignore", ".gitignore"
   end
 
-  say_step "Vendoring Rails application at test/dummy"
+  say_step "Vendoring Rails applications at test/dummy-apps"
 
-  def invoke_rails_app_generator
-    invoke Rails::Generators::AppGenerator,
-      [ File.expand_path(dummy_path, destination_root) ]
-  end
+  def invoke_rails_app_generators
+    orms.each do |orm| 
+      dummy_app_path = app_path orm
 
-  say_step "Configuring Rails application"
+      say_step "Creating dummy Rails app with #{orm}"
+      invoke Rails::Generators::AppGenerator, app_args orm      
 
-  def change_config_files
-    store_application_definition!
-    template "rails/boot.rb", "#{dummy_path}/config/boot.rb", :force => true
-    template "rails/application.rb", "#{dummy_path}/config/application.rb", :force => true
-  end
+      say_step "Configuring Rails app"
+      change_config_files dummy_app_path
 
-  say_step "Removing unneeded files"
+      say_step "Removing unneeded files"
+      remove_uneeded_rails_files dummy_app_path
+            
+      if respond_to? orm_config_method(orm)
+        say_step "Configuring app for #{orm}"
+        send orm_config_method(orm), dummy_app_path
+      end
 
-  def remove_uneeded_rails_files
-    inside dummy_path do
-      remove_file ".gitignore"
-      remove_file "db/seeds.rb"
-      remove_file "doc"
-      remove_file "Gemfile"
-      remove_file "lib/tasks"
-      remove_file "public/images/rails.png"
-      remove_file "public/index.html"
-      remove_file "public/robots.txt"
-      remove_file "README"
-      remove_file "test"
-      remove_file "vendor"
+      say_step "Configuring testing framework for #{orm}"      
+      set_orm_helpers orm
     end
   end
 
   protected
+
+    def set_orm_helpers orm
+      dummy_app_path = app_path orm
+      inside dummy_app_path do
+        inside test_path do
+          if rspec?
+            File.replace_content_from 'integration/navigation_spec.rb', :where => '#orm#', :with => orm
+            File.replace_content_from "integration/#{underscored}_spec.rb", :where => '#orm#', :with => orm        
+          else
+            say "Not implemented for test unit"
+          end
+        end
+      end
+    end
+
+    def orm_config_method orm
+      "config_#{orm}"
+    end
+
+    def config_mongoid
+      inside dummy_app_path do
+        gemfile = File.new('Gemfile')
+        gemfile.insert :after => 'gem "sqlite3"' do 
+         %q{gem "mongoid"
+gem "bson_ext"
+}
+        end
+        gemfile.remove_content 'gem "sqlite3"'
+        `bundle install`
+        `rails g mongoid:config`
+      end
+    end
+
+    def remove_uneeded_rails_files dummy_app_path
+      inside dummy_app_path do
+        remove_file ".gitignore"
+        # remove_file "db/seeds.rb"
+        remove_file "doc"
+        # remove_file "Gemfile"
+        remove_file "lib/tasks"
+        remove_file "public/images/rails.png"
+        remove_file "public/index.html"
+        remove_file "public/robots.txt"
+        remove_file "README"
+        remove_file "test"
+        remove_file "vendor"
+      end
+    end
+
+    def change_config_files dummy_app_path
+      store_application_definition! dummy_app_path
+      template "rails/boot.rb", "#{dummy_app_path}/config/boot.rb", :force => true
+      template "rails/application.rb", "#{dummy_app_path}/config/application.rb", :force => true
+    end
+  
+    def app_path orm
+      File.expand_path(dummy_path orm, destination_root)
+    end
+
+    def app_args orm
+      args = [app_path(orm), "-T"] # skip test unit
+      args << "-T" if skip_testunit?
+      args << "-J" if skip_javascript?      
+      # skip active record is orm is set to another datastore      
+      args << "-O" if !active_record? orm
+      args
+    end
+
+    def active_record? orm
+      !orm || ['active_record', 'ar'].include? orm
+    end
+
+    def skip_testunit?
+      options[:tu]
+    end
+
+    def skip_javascript?
+      options[:js]
+    end
 
     def rspec?
       options[:test_framework] == "rspec"
@@ -97,17 +180,17 @@ class Enginex < Thor::Group
       rspec? ? "spec" : "test"
     end
 
-    def dummy_path
-      "#{test_path}/dummy"
+    def dummy_path orm = 'active_record'
+      "#{test_path}/dummy-apps/dummy-#{orm}"
     end
 
     def self.banner
       self_task.formatted_usage(self, false)
     end
 
-    def application_definition
+    def application_definition dummy_app_path
       @application_definition ||= begin
-        contents = File.read(File.expand_path("#{dummy_path}/config/application.rb", destination_root))
+        contents = File.read(File.expand_path("#{dummy_app_path}/config/application.rb", destination_root))
         contents[(contents.index("module Dummy"))..-1]
       end
     end

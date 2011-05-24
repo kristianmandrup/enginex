@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'orm/<%= orm %>_helper'
 
 describe "Navigation" do
   include Capybara

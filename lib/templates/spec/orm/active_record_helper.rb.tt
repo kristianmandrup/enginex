@@ -1,0 +1,12 @@
+# Configure Rails Envinronment
+ENV["RAILS_ENV"] = "test"
+require File.expand_path("../../dummy_apps/dummy-active_record/config/environment.rb",  __FILE__)
+
+require 'spec_helper/init'
+
+# Run any available migration  
+migrations_dir = File.expand_path("../../dummy-apps/dummy-active_record/db/migrate/", __FILE__)
+
+ActiveRecord::Migrator.migrate migrations_dir
+
+require 'spec_helper/config'
